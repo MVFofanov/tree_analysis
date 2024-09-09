@@ -1,0 +1,13 @@
+input:
+  deni_data: "/home/zo49sog/crassvirales/Bas_phages_large/Bas_phages/5_nr_screening/4_merged_ncbi_crassvirales"
+  tree_leaves: "{deni_data}/2_trees_leaves"
+  wd: "{tree_leaves}/phylome_summary/tree_analysis_test"
+  phylogenetic_trees_dir: "{deni_data}/2_trees"
+  annotation_file: "{tree_leaves}/phylome_summary/phylome_summary_with_current_taxonomy_and_phylome.txt"
+  annotation_file_id: "{tree_leaves}/phylome_summary/phylome_summary_with_current_taxonomy_and_phylome_id.txt"
+  config_dir: "{wd}/config"
+  clusters_file: "{config_dir}/clusters.txt"
+
+output:
+  base_output_dir: "{wd}/results"
+  logs_dir: "{base_output_dir}/logs"
