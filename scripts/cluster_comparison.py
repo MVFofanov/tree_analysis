@@ -212,7 +212,8 @@ def plot_cumulative_phyla_barplot(df: pd.DataFrame, output_dir: str) -> None:
 
 
 def plot_cumulative_relative_abundances_barplot(df: pd.DataFrame, output_dir: str) -> None:
-    """Generate and save a cumulative barplot for Crassvirales thresholds showing relative abundances by bacterial phyla."""
+    """Generate and save a cumulative barplot for Crassvirales thresholds showing
+    relative abundances by bacterial phyla."""
 
     # Aggregate the relative data by threshold
     aggregated_df = df.groupby('threshold').agg({
@@ -272,7 +273,8 @@ def plot_cumulative_relative_abundances_barplot(df: pd.DataFrame, output_dir: st
 
 @time_it("Generating line plot for mean relative abundances by Crassvirales thresholds")
 def plot_mean_relative_abundances_lineplot(df: pd.DataFrame, output_dir: str) -> None:
-    """Generate and save a line plot showing the mean relative abundances for taxonomic groups by Crassvirales thresholds."""
+    """Generate and save a line plot showing the mean relative abundances
+    for taxonomic groups by Crassvirales thresholds."""
 
     # Aggregate the data by threshold to compute the mean of relative abundances
     aggregated_df = df.groupby('threshold').agg({
@@ -344,13 +346,15 @@ def plot_mean_relative_abundances_with_error_bands(df: pd.DataFrame, output_dir:
     # Plot each taxonomic group with its respective error band
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Bacteroidetes_to_total_mean'],
-        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_0>'], aggregated_df['ratio_Bacteroidetes_to_total_<lambda_1>'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_0>'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_1>'],
         'Bacteroidetes', phylum_colors['Bacteroidetes']
     )
 
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Actinobacteria_to_total_mean'],
-        aggregated_df['ratio_Actinobacteria_to_total_<lambda_0>'], aggregated_df['ratio_Actinobacteria_to_total_<lambda_1>'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_1>'],
         'Actinobacteria', phylum_colors['Actinobacteria']
     )
 
@@ -362,7 +366,8 @@ def plot_mean_relative_abundances_with_error_bands(df: pd.DataFrame, output_dir:
 
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Proteobacteria_to_total_mean'],
-        aggregated_df['ratio_Proteobacteria_to_total_<lambda_0>'], aggregated_df['ratio_Proteobacteria_to_total_<lambda_1>'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_1>'],
         'Proteobacteria', phylum_colors['Proteobacteria']
     )
 
@@ -397,7 +402,8 @@ def plot_mean_relative_abundances_with_error_bands(df: pd.DataFrame, output_dir:
 
 
 def plot_mean_relative_abundances_with_log10_error_bands(df: pd.DataFrame, output_dir: str) -> None:
-    """Generate and save a line plot showing the log10-transformed mean relative abundances with 25th and 75th percentiles
+    """Generate and save a line plot showing the log10-transformed mean relative abundances
+    with 25th and 75th percentiles
     for taxonomic groups by Crassvirales thresholds."""
 
     # Aggregate the data by threshold to compute the mean and percentiles of relative abundances
@@ -421,20 +427,22 @@ def plot_mean_relative_abundances_with_log10_error_bands(df: pd.DataFrame, outpu
         log_y_mean = np.log10(y_mean + 1e-3)  # Adding small value to avoid log10(0)
         log_y_lower = np.log10(y_lower + 1e-3)
         log_y_upper = np.log10(y_upper + 1e-3)
-        
+
         plt.plot(x, log_y_mean, label=label, color=color, marker='o')
-        plt.fill_between(x, log_y_lower, log_y_upper, color=color, alpha=0.3)  # Shaded area between 25th and 75th percentile
+        plt.fill_between(x, log_y_lower, log_y_upper, color=color, alpha=0.3)  # Shaded area between 25% and 75%
 
     # Plot each taxonomic group with its respective log10 error band
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Bacteroidetes_to_total_mean'],
-        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_0>'], aggregated_df['ratio_Bacteroidetes_to_total_<lambda_1>'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_0>'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_1>'],
         'Bacteroidetes', phylum_colors['Bacteroidetes']
     )
 
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Actinobacteria_to_total_mean'],
-        aggregated_df['ratio_Actinobacteria_to_total_<lambda_0>'], aggregated_df['ratio_Actinobacteria_to_total_<lambda_1>'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_1>'],
         'Actinobacteria', phylum_colors['Actinobacteria']
     )
 
@@ -446,7 +454,8 @@ def plot_mean_relative_abundances_with_log10_error_bands(df: pd.DataFrame, outpu
 
     plot_with_error_bands(
         aggregated_df['threshold'], aggregated_df['ratio_Proteobacteria_to_total_mean'],
-        aggregated_df['ratio_Proteobacteria_to_total_<lambda_0>'], aggregated_df['ratio_Proteobacteria_to_total_<lambda_1>'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_1>'],
         'Proteobacteria', phylum_colors['Proteobacteria']
     )
 
@@ -496,9 +505,10 @@ def compare_clusters(cluster_names: List[str], base_output_dir: str, tree_types:
             plot_mean_relative_abundances_lineplot(concatenated_df,
                                                    os.path.join(base_output_dir, 'cluster_analysis', tree_type))
             plot_mean_relative_abundances_with_error_bands(concatenated_df,
-                                                   os.path.join(base_output_dir, 'cluster_analysis', tree_type))
+                                                           os.path.join(base_output_dir, 'cluster_analysis', tree_type))
             plot_mean_relative_abundances_with_log10_error_bands(concatenated_df,
-                                                   os.path.join(base_output_dir, 'cluster_analysis', tree_type))
+                                                                 os.path.join(base_output_dir, 'cluster_analysis',
+                                                                              tree_type))
         except FileNotFoundError as e:
             print(e)
             logging.error(e)

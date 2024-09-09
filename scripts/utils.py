@@ -20,7 +20,7 @@ def time_it(message: Optional[str] = None) -> Callable[..., Any]:
             arg_dict = dict(zip(arg_names, args))
             all_kwargs = {**arg_dict, **kwargs}
 
-            func_name = func.__name__
+            # func_name = func.__name__
 
             # If a message is provided, format it with combined arguments
             if message:

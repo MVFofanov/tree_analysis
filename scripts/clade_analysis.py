@@ -253,8 +253,7 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
         else:
             logging.warning(f"{file_path} does not exist.")
             # print(f"Warning: {file_path} does not exist.")
-            
-        
+
     if all_data:
         # Concatenate all dataframes
         concatenated_df = pd.concat(all_data, ignore_index=True)
@@ -266,7 +265,7 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
         # print(f"No data found to concatenate in {output_dir}")
 
 
-#@time_it("Assign clade features")
+# @time_it("Assign clade features")
 # def assign_clade_features(tree: Tree, largest_clades: Dict[int, pd.DataFrame]) -> None:
 #     """Assign clade features to each node for thresholds 0-100%."""
 #     for threshold, clades_df in largest_clades.items():
@@ -292,13 +291,13 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
 #         #         break
 #         #     break
 #         # break
-# 
+#
 #             # matching_nodes = tree.search_nodes(name=node_name)
 #             # if matching_nodes:
 #             #     node = matching_nodes[0]
 #             #     node.add_feature(f'clade_{threshold}', True)
 #             #     logging.debug(f"Assigned clade_{threshold} as True to node {node.name}")
-# 
+#
 #     # Set False for clades that do not belong to any largest non-intersecting clades
 #     for node in tree.traverse():
 #         for threshold in range(0, 101, 10):

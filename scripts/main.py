@@ -6,14 +6,14 @@ import yaml
 from typing import Dict
 
 import pandas as pd
+
 from clade_analysis import assign_clade_features, save_clade_statistics, \
     concatenate_clades_tables, save_biggest_non_intersecting_clades_by_thresholds
-from cluster_comparison import compare_clusters
 from logging_utils import setup_logging
 from plot_tree import save_tree_plot
 from plotting import generate_plots
 from tree_utils import load_tree, load_annotations, annotate_tree_id, assign_unique_ids, \
-    ensure_directory_exists, extract_cluster_name, root_tree_at_bacteria
+    ensure_directory_exists, root_tree_at_bacteria
 from utils import time_it
 
 # Set environment variable for non-interactive backend
@@ -118,7 +118,7 @@ def process_and_save_tree(cluster_name: str, tree_type: str, tree_path: str, ann
         #     print(f'{clades_file=}')
         #     clades_df = pd.read_csv(clades_file, sep='\t')
         #     largest_clades[threshold] = clades_df
-        
+
         if os.path.exists(clades_file):
             logging.debug(f"{clades_file=}")
             # print(f'{clades_file=}')
@@ -161,7 +161,8 @@ def process_tree_type(tree_type: str, cluster_name: str, trees_dir: str, annotat
     """Process a specific tree type for a given cluster."""
     tree_path = f'{trees_dir}/{cluster_name}_ncbi_trimmed.nw'
     output_paths = setup_output_paths(base_output_dir, cluster_name, tree_type)
-    process_and_save_tree(cluster_name, tree_type, tree_path, annotation_dict, output_paths, align_labels=False, align_boxes=True,
+    process_and_save_tree(cluster_name, tree_type, tree_path, annotation_dict, output_paths,
+                          align_labels=False, align_boxes=True,
                           logging_level=logging.INFO)
     concatenate_clades_tables(output_paths['output_dir'], output_paths['biggest_non_intersecting_clades_all'])
     generate_plots(output_paths, tree_type)
@@ -217,7 +218,7 @@ def main(config_file: str, cluster_name: str) -> None:
     annotations = load_annotations(paths['annotation_path_id'])
 
     if annotations.duplicated(subset='protein_id').any():
-        logging.info(f"Duplicate protein IDs found. Removing duplicates.")
+        logging.info("Duplicate protein IDs found. Removing duplicates.")
         # print("Duplicate protein IDs found. Removing duplicates.")
         annotations = annotations.drop_duplicates(subset='protein_id')
 
@@ -227,7 +228,6 @@ def main(config_file: str, cluster_name: str) -> None:
 
     process_cluster(cluster_name, tree_types, paths, annotation_dict)
     logging.info(f"Cluster {cluster_name} analysis completed")
-
 
     # final_log_file = os.path.join(paths['base_output_dir'], 'final_log_tree_analysis.log')
     # concatenate_logs(paths['base_output_dir'], final_log_file, cluster_names)
@@ -246,4 +246,3 @@ if __name__ == "__main__":
     main(config_file=args.config, cluster_name=args.cluster)
 
     # compare_clusters(cluster_names=cluster_names, base_output_dir=paths['base_output_dir'], tree_types=tree_types)
-
