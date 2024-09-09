@@ -1,11 +1,11 @@
-configfile: "/home/zo49sog/crassvirales/Bas_phages_large/Bas_phages/5_nr_screening/4_merged_ncbi_crassvirales/2_trees_leaves/phylome_summary/tree_analysis_test/config/config.yaml"
+configfile: "/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml"
 
 import os
 from glob import glob
 import yaml
 
 # Load the configuration file
-config_file = "/home/zo49sog/crassvirales/Bas_phages_large/Bas_phages/5_nr_screening/4_merged_ncbi_crassvirales/2_trees_leaves/phylome_summary/tree_analysis_test/config/config.yaml"
+config_file = "/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml"
 
 with open(config_file) as file:
     config = yaml.safe_load(file)
@@ -36,7 +36,8 @@ rule all:
 # Rule for processing individual clusters
 rule process_cluster:
     input:
-        config="/home/zo49sog/crassvirales/Bas_phages_large/Bas_phages/5_nr_screening/4_merged_ncbi_crassvirales/2_trees_leaves/phylome_summary/tree_analysis_test/config/config.yaml"
+        config="/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml",
+        clusters_file=clusters_file
     output:
         log_file=f"{base_output_dir}/{{cluster}}/rooted/{{cluster}}_log_tree_analysis.log",
         biggest_clades=f"{base_output_dir}/{{cluster}}/rooted/biggest_non_intersecting_clades_all.tsv",
@@ -45,14 +46,15 @@ rule process_cluster:
     shell:
         """
         mkdir -p {output_dir}/{wildcards.cluster}
-        python3 /home/zo49sog/crassvirales/phylomes/scripts/tree_analysis/main.py --cluster {wildcards.cluster} --config {input.config}
+        source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
+        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/main.py --cluster {wildcards.cluster} --config {input.config}
         """
 
 # Rule for comparing clusters after processing all clusters
 rule compare_clusters:
     input:
         expand(f"{base_output_dir}/{{cluster}}/rooted/biggest_non_intersecting_clades_all.tsv", cluster=cluster_names),
-        config="/home/zo49sog/crassvirales/Bas_phages_large/Bas_phages/5_nr_screening/4_merged_ncbi_crassvirales/2_trees_leaves/phylome_summary/tree_analysis_test/config/config.yaml",
+        config="/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml",
         clusters_file=clusters_file
     output:
         final_log=f"{base_output_dir}/cluster_analysis/rooted/comparison_complete.log",
@@ -60,5 +62,6 @@ rule compare_clusters:
     threads: 1
     shell:
         """
-        python3 /home/zo49sog/crassvirales/phylomes/scripts/tree_analysis/cluster_comparison.py --config {input.config} --clusters_file "{input.clusters_file}" > {output.final_log}
+        source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
+        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/cluster_comparison.py --config {input.config} --clusters_file "{input.clusters_file}" > {output.final_log}
         """

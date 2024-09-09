@@ -6,8 +6,9 @@ input:
   annotation_file: "{tree_leaves}/phylome_summary/phylome_summary_with_current_taxonomy_and_phylome.txt"
   annotation_file_id: "{tree_leaves}/phylome_summary/phylome_summary_with_current_taxonomy_and_phylome_id.txt"
   config_dir: "{wd}/config"
-  clusters_file: "{config_dir}/clusters.txt"
+#  clusters_file: "{config_dir}/clusters.txt"
+  clusters_file: "{config_dir}/clusters_test.txt"
 
 output:
-  base_output_dir: "{wd}/results"
+  base_output_dir: "/home/zo49sog/crassvirales/phylomes/tree_analysis/results"
   logs_dir: "{base_output_dir}/logs"
