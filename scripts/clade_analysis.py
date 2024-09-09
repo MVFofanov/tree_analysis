@@ -310,7 +310,7 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
 @time_it("Assign clade features")
 def assign_clade_features(tree: Tree, largest_clades: Dict[int, pd.DataFrame]) -> None:
     """Assign clade features to each node for thresholds 0-100%."""
-    
+
     # Create a lookup table for tree nodes to avoid repeated calls to tree.search_nodes()
     tree_node_lookup = {node.name: node for node in tree.traverse()}
 
@@ -318,7 +318,7 @@ def assign_clade_features(tree: Tree, largest_clades: Dict[int, pd.DataFrame]) -
     for threshold, clades_df in largest_clades.items():
         for _, row in clades_df.iterrows():
             all_members = set(row['all_members'].split(', '))  # Use a set for faster lookups
-            
+
             # Assign clade feature to matching nodes
             for member in all_members:
                 node = tree_node_lookup.get(member)  # Direct lookup from the pre-built dictionary
