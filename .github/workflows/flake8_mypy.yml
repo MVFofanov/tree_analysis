@@ -30,4 +30,4 @@ jobs:
         flake8 . --count  --show-source --statistics --max-line-length 120
     - name: Type checking with mypy
       run: |
-        mypy --ignore-missing-imports .
+        mypy --ignore-missing-imports --install-types .
