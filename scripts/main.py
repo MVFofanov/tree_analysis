@@ -235,7 +235,7 @@ def main(config_file: str, cluster_name: str) -> None:
     annotation_dict = annotations.set_index('protein_id').to_dict('index')
 
     # Add both rooted and unrooted tree types
-    tree_types = config.get('tree_types', ['rooted', 'unrooted'])
+    tree_types = config.get('tree_types', ['rooted', 'unrooted', 'midpoint'])
 
     # Process each tree type for the specified cluster
     process_cluster(cluster_name, tree_types, paths, annotation_dict)

@@ -534,7 +534,7 @@ def main(config_file: str, clusters_file: str) -> None:
     compare_clusters(
         cluster_names=cluster_names,
         base_output_dir=config["output"]["base_output_dir"],
-        tree_types=["rooted", "unrooted"]
+        tree_types=["rooted", "unrooted", "midpoint"]
     )
 
 

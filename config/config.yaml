@@ -18,3 +18,4 @@ output:
 tree_types:
   - rooted
   - unrooted  # Adding unrooted tree type
+  - midpoint

@@ -28,7 +28,7 @@ with open(clusters_file) as f:
     cluster_names = [line.strip() for line in f.readlines() if line.strip()]
 
 # Define tree types
-tree_types = ["rooted", "unrooted"]
+tree_types = ["rooted", "unrooted", "midpoint"]
 
 # Main rule to request all outputs for both rooted and unrooted trees
 rule all:
@@ -40,7 +40,7 @@ rule all:
 # Rule for processing individual clusters
 rule process_cluster:
     input:
-        config="/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml",
+        config=config_file,
         clusters_file=clusters_file
     output:
         log_file=f"{base_output_dir}/{{cluster}}/{{tree_type}}/{{cluster}}_log_tree_analysis.log",
@@ -61,7 +61,7 @@ rule compare_clusters:
     input:
         expand(f"{base_output_dir}/{{cluster}}/{{tree_type}}/biggest_non_intersecting_clades_all.tsv",
                cluster=cluster_names, tree_type=tree_types),
-        config="/home/zo49sog/crassvirales/phylomes/tree_analysis/config/config.yaml",
+        config=config_file,
         clusters_file=clusters_file
     output:
         final_log=f"{base_output_dir}/cluster_analysis/{{tree_type}}/comparison_complete.log",
