@@ -53,7 +53,7 @@ rule process_cluster:
         """
         mkdir -p {output_dir}/{wildcards.cluster}/{wildcards.tree_type}
         source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
-        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/main.py --cluster {wildcards.cluster} --tree_type {wildcards.tree_type} --config {input.config}
+        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/main.py --cluster {wildcards.cluster} --config {input.config}
         """
 
 # Rule for comparing clusters after processing all clusters (rooted and unrooted)
@@ -72,5 +72,5 @@ rule compare_clusters:
     shell:
         """
         source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
-        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/cluster_comparison.py --config {input.config} --clusters_file "{input.clusters_file}" --tree_type {params.tree_type} > {output.final_log}
+        python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/cluster_comparison.py --config {input.config} --clusters_file "{input.clusters_file}" > {output.final_log}
         """

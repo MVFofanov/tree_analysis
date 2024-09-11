@@ -114,31 +114,31 @@ def process_and_save_tree(cluster_name: str, tree_type: str, tree_path: str, ann
         logging.info(f"Processing unrooted tree for cluster {cluster_name}. No re-rooting applied.")
 
     largest_clades = {}
-    for i in range(0, 11):
-        threshold = i * 10
-        clades_file = os.path.join(output_paths['output_dir'],
-                                   f"biggest_non_intersecting_clades_{threshold}_percent.tsv")
-        # if os.path.exists(clades_file):
-        #     print(f'{clades_file=}')
-        #     clades_df = pd.read_csv(clades_file, sep='\t')
-        #     largest_clades[threshold] = clades_df
-
-        if os.path.exists(clades_file):
-            logging.debug(f"{clades_file=}")
-            # print(f'{clades_file=}')
-            # Check if the file contains any non-empty lines
-            with open(clades_file) as f:
-                non_empty_lines = [line for line in f if line.strip()]
-
-            if len(non_empty_lines) == 0:
-                logging.warning(f"{clades_file} exists but contains no non-empty lines.")
-                # print(f"Warning: {clades_file} exists but contains no non-empty lines.")
-            else:
-                clades_df = pd.read_csv(clades_file, sep='\t')
-                largest_clades[threshold] = clades_df
-        else:
-            logging.warning(f"Warning: {clades_file} does not exist.")
-            # print(f"Warning: {clades_file} does not exist.")
+    # for i in range(0, 11):
+    #     threshold = i * 10
+    #     clades_file = os.path.join(output_paths['output_dir'],
+    #                                f"biggest_non_intersecting_clades_{threshold}_percent.tsv")
+    #     # if os.path.exists(clades_file):
+    #     #     print(f'{clades_file=}')
+    #     #     clades_df = pd.read_csv(clades_file, sep='\t')
+    #     #     largest_clades[threshold] = clades_df
+    #
+    #     if os.path.exists(clades_file):
+    #         logging.debug(f"{clades_file=}")
+    #         # print(f'{clades_file=}')
+    #         # Check if the file contains any non-empty lines
+    #         with open(clades_file) as f:
+    #             non_empty_lines = [line for line in f if line.strip()]
+    #
+    #         if len(non_empty_lines) == 0:
+    #             logging.warning(f"{clades_file} exists but contains no non-empty lines.")
+    #             # print(f"Warning: {clades_file} exists but contains no non-empty lines.")
+    #         else:
+    #             clades_df = pd.read_csv(clades_file, sep='\t')
+    #             largest_clades[threshold] = clades_df
+    #     else:
+    #         logging.warning(f"Warning: {clades_file} does not exist.")
+    #         # print(f"Warning: {clades_file} does not exist.")
 
     assign_clade_features(tree, largest_clades)
 
@@ -253,6 +253,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run tree analysis for a specific protein cluster.")
     parser.add_argument("-c", "--config", required=True, help="Path to the YAML configuration file.")
     parser.add_argument("--cluster", required=True, help="Protein cluster name to process.")
+    #parser.add_argument("--tree_type", required=True, help="Rooting tree type to process.")
     args = parser.parse_args()
 
     main(config_file=args.config, cluster_name=args.cluster)
