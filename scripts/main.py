@@ -106,8 +106,12 @@ def process_and_save_tree(cluster_name: str, tree_type: str, tree_path: str, ann
 
     if tree_type == 'rooted':
         root_tree_at_bacteria(tree)
+        logging.info(f"Processing rooted tree for cluster {cluster_name}.")
     elif tree_type == 'midpoint':
         tree.set_outgroup(tree.get_midpoint_outgroup())
+        logging.info(f"Processing midpoint rooted tree for cluster {cluster_name}.")
+    elif tree_type == 'unrooted':
+        logging.info(f"Processing unrooted tree for cluster {cluster_name}. No re-rooting applied.")
 
     largest_clades = {}
     for i in range(0, 11):
@@ -161,10 +165,16 @@ def process_tree_type(tree_type: str, cluster_name: str, trees_dir: str, annotat
     """Process a specific tree type for a given cluster."""
     tree_path = f'{trees_dir}/{cluster_name}_ncbi_trimmed.nw'
     output_paths = setup_output_paths(base_output_dir, cluster_name, tree_type)
+
+    # Process and save the tree
     process_and_save_tree(cluster_name, tree_type, tree_path, annotation_dict, output_paths,
                           align_labels=False, align_boxes=True,
                           logging_level=logging.INFO)
+
+    # Concatenate clades tables
     concatenate_clades_tables(output_paths['output_dir'], output_paths['biggest_non_intersecting_clades_all'])
+
+    # Generate plots for the tree type
     generate_plots(output_paths, tree_type)
 
 
@@ -224,8 +234,10 @@ def main(config_file: str, cluster_name: str) -> None:
 
     annotation_dict = annotations.set_index('protein_id').to_dict('index')
 
-    tree_types = config.get('tree_types', ['rooted'])
+    # Add both rooted and unrooted tree types
+    tree_types = config.get('tree_types', ['rooted', 'unrooted'])
 
+    # Process each tree type for the specified cluster
     process_cluster(cluster_name, tree_types, paths, annotation_dict)
     logging.info(f"Cluster {cluster_name} analysis completed")
 
