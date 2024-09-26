@@ -592,13 +592,13 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
     """Generate and save a line plot showing the mean relative abundances with top 25%, bottom 25%, and all values
     for taxonomic groups by Crassvirales thresholds."""
 
-    # Function to calculate the top and bottom 25% means
+    # Function to calculate the mean for all values, the top 25%, and the bottom 25%
     def calculate_top_bottom_means(group):
-        return pd.Series({
-            'mean': group.mean(),
-            'top_25_mean': group[group >= group.quantile(0.75)].mean(),
-            'bottom_25_mean': group[group <= group.quantile(0.25)].mean()
-        })
+        if len(group) == 0:
+            return pd.Series({'mean': np.nan, 'top_25_mean': np.nan, 'bottom_25_mean': np.nan})
+        top_25_mean = group[group >= group.quantile(0.75)].mean() if not group.empty else np.nan
+        bottom_25_mean = group[group <= group.quantile(0.25)].mean() if not group.empty else np.nan
+        return pd.Series({'mean': group.mean(), 'top_25_mean': top_25_mean, 'bottom_25_mean': bottom_25_mean})
 
     # Aggregate the data by threshold to compute the mean, top 25%, and bottom 25% of relative abundances
     aggregated_df = df.groupby('threshold').agg({
@@ -607,8 +607,7 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         'ratio_Bacillota_to_total': calculate_top_bottom_means,
         'ratio_Proteobacteria_to_total': calculate_top_bottom_means,
         'ratio_Other_to_total': calculate_top_bottom_means,
-        'ratio_viral_to_total': calculate_top_bottom_means,
-        'crassvirales_ratio': calculate_top_bottom_means
+        'ratio_viral_to_total': calculate_top_bottom_means
     }).reset_index()
 
     # Flatten the multi-index columns
@@ -616,7 +615,7 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
 
     plt.figure(figsize=(14, 8))
 
-    # Function to plot the mean and error band for each taxonomic group
+    # Function to plot the mean and top-bottom 25% ranges
     def plot_top_bottom_25(x, y_mean, y_lower, y_upper, label, color):
         plt.plot(x, y_mean, label=label, color=color, marker='o')
         plt.fill_between(x, y_lower, y_upper, color=color, alpha=0.3)
