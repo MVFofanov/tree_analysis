@@ -526,6 +526,11 @@ def plot_median_relative_abundances_with_error_bands(df: pd.DataFrame, output_di
             aggregated_df[f'ratio_{category}_to_total_<lambda_1>'],
             category, phylum_colors[color] if category != 'viral' else superkingdom_colors['Viruses'])
 
+    plt.title('Median Relative Abundances by Crassvirales Threshold (With Percentiles)')
+    plt.xlabel('Crassvirales Threshold (%)')
+    plt.ylabel('Median Relative Abundance (with 25th and 75th Percentiles)')
+    plt.legend(title='Taxonomic Groups')
+
     # Save the plot
     save_plot('median_relative_abundances_with_percentiles_lineplot.png', output_dir)
 
@@ -574,6 +579,11 @@ def plot_mean_relative_abundances_with_std(df: pd.DataFrame, output_dir: str) ->
             aggregated_df[f'ratio_{category}_to_total_std'],
             category, phylum_colors[color] if category != 'viral' else superkingdom_colors['Viruses'])
 
+    plt.title('Mean Relative Abundances by Crassvirales Threshold (With standard deviation)')
+    plt.xlabel('Crassvirales Threshold (%)')
+    plt.ylabel('Mean Relative Abundance (With standard deviation)')
+    plt.legend(title='Taxonomic Groups')
+
     save_plot('mean_relative_abundances_with_std_lineplot.png', output_dir)
 
 
@@ -613,6 +623,11 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
             aggregated_df[f'ratio_{category}_to_total_<lambda_0>'],
             aggregated_df[f'ratio_{category}_to_total_<lambda_1>'],
             category, phylum_colors[color] if category != 'viral' else superkingdom_colors['Viruses'])
+
+    plt.title('Mean Relative Abundances by Crassvirales Threshold with meand for top and bottom 25%')
+    plt.xlabel('Crassvirales Threshold (%)')
+    plt.ylabel('Mean Relative Abundance')
+    plt.legend(title='Taxonomic Groups')
 
     save_plot('mean_relative_abundances_top_bottom_25_lineplot.png', output_dir)
 
