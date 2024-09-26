@@ -610,13 +610,15 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
     for col in agg_columns:
         # Apply the aggregation function for each column separately
         agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
-        # Flatten the resulting DataFrame
-        agg_result = pd.concat([agg_result['threshold'], agg_result[col].apply(pd.Series)], axis=1)
+
+        # Rename the columns in agg_result to prevent conflicts
+        agg_result.columns = ['threshold', f'{col}_mean', f'{col}_top_25_mean', f'{col}_bottom_25_mean']
+
         # Merge into the final DataFrame with appropriate suffixes to avoid conflicts
         if aggregated_df.empty:
             aggregated_df = agg_result
         else:
-            aggregated_df = pd.merge(aggregated_df, agg_result, on='threshold', suffixes=('', f'_{col}'))
+            aggregated_df = pd.merge(aggregated_df, agg_result, on='threshold')
 
     # Plotting
     plt.figure(figsize=(14, 8))
