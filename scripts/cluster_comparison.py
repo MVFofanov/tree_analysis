@@ -592,30 +592,35 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
     """Generate and save a line plot showing the mean relative abundances with top 25%, bottom 25%, and all values
     for taxonomic groups by Crassvirales thresholds."""
 
-    # Function to calculate the mean for all values, the top 25%, and the bottom 25%
     def calculate_top_bottom_means(group):
-        if len(group) == 0:
+        """Calculate the mean, top 25%, and bottom 25% means for a group."""
+        if group.empty:
             return pd.Series({'mean': np.nan, 'top_25_mean': np.nan, 'bottom_25_mean': np.nan})
+
         top_25_mean = group[group >= group.quantile(0.75)].mean() if not group.empty else np.nan
         bottom_25_mean = group[group <= group.quantile(0.25)].mean() if not group.empty else np.nan
         return pd.Series({'mean': group.mean(), 'top_25_mean': top_25_mean, 'bottom_25_mean': bottom_25_mean})
 
-    # Aggregate the data by threshold to compute the mean, top 25%, and bottom 25% of relative abundances
-    aggregated_df = df.groupby('threshold').agg({
-        'ratio_Bacteroidetes_to_total': calculate_top_bottom_means,
-        'ratio_Actinobacteria_to_total': calculate_top_bottom_means,
-        'ratio_Bacillota_to_total': calculate_top_bottom_means,
-        'ratio_Proteobacteria_to_total': calculate_top_bottom_means,
-        'ratio_Other_to_total': calculate_top_bottom_means,
-        'ratio_viral_to_total': calculate_top_bottom_means
-    }).reset_index()
+    # Separate aggregation step for each taxonomic group
+    agg_columns = ['ratio_Bacteroidetes_to_total', 'ratio_Actinobacteria_to_total', 'ratio_Bacillota_to_total',
+                   'ratio_Proteobacteria_to_total', 'ratio_Other_to_total', 'ratio_viral_to_total']
 
-    # Flatten the multi-index columns
-    aggregated_df.columns = ['_'.join(col).strip() if col[1] else col[0] for col in aggregated_df.columns.values]
+    aggregated_df = pd.DataFrame()
 
+    for col in agg_columns:
+        # Apply the aggregation function for each column separately
+        agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
+        # Flatten the resulting DataFrame
+        agg_result = pd.concat([agg_result['threshold'], agg_result[col].apply(pd.Series)], axis=1)
+        # Merge into the final DataFrame
+        if aggregated_df.empty:
+            aggregated_df = agg_result
+        else:
+            aggregated_df = pd.merge(aggregated_df, agg_result, on='threshold')
+
+    # Plotting
     plt.figure(figsize=(14, 8))
 
-    # Function to plot the mean and top-bottom 25% ranges
     def plot_top_bottom_25(x, y_mean, y_lower, y_upper, label, color):
         plt.plot(x, y_mean, label=label, color=color, marker='o')
         plt.fill_between(x, y_lower, y_upper, color=color, alpha=0.3)
