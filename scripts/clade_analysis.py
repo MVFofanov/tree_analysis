@@ -256,14 +256,14 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
                 # Insert threshold column and append to the list of dataframes
                 df.insert(0, 'threshold', threshold)
                 all_data.append(df)
-            
+
             except pd.errors.EmptyDataError:
                 logging.warning(f"{file_path} could not be read (EmptyDataError) and will be skipped.")
                 continue
 
         else:
             logging.warning(f"{file_path} does not exist.")
-    
+
     if all_data:
         # Concatenate all dataframes and save the result
         concatenated_df = pd.concat(all_data, ignore_index=True)

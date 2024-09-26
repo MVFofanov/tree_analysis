@@ -5,7 +5,7 @@ import os
 import yaml
 from typing import Dict
 
-import pandas as pd
+# import pandas as pd
 
 from clade_analysis import assign_clade_features, save_clade_statistics, \
     concatenate_clades_tables, save_biggest_non_intersecting_clades_by_thresholds
@@ -253,7 +253,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run tree analysis for a specific protein cluster.")
     parser.add_argument("-c", "--config", required=True, help="Path to the YAML configuration file.")
     parser.add_argument("--cluster", required=True, help="Protein cluster name to process.")
-    #parser.add_argument("--tree_type", required=True, help="Rooting tree type to process.")
+    # parser.add_argument("--tree_type", required=True, help="Rooting tree type to process.")
     args = parser.parse_args()
 
     main(config_file=args.config, cluster_name=args.cluster)
