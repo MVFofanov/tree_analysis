@@ -594,9 +594,6 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
 
     def calculate_top_bottom_means(group):
         """Calculate the mean, top 25%, and bottom 25% means for a group."""
-        if group.empty:
-            return pd.Series({'mean': np.nan, 'top_25_mean': np.nan, 'bottom_25_mean': np.nan})
-
         top_25_mean = group[group >= group.quantile(0.75)].mean() if not group.empty else np.nan
         bottom_25_mean = group[group <= group.quantile(0.25)].mean() if not group.empty else np.nan
         return pd.Series({'mean': group.mean(), 'top_25_mean': top_25_mean, 'bottom_25_mean': bottom_25_mean})
@@ -611,7 +608,7 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         # Apply the aggregation function for each column separately
         agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
 
-        # Rename the columns in agg_result to prevent conflicts
+        # Flatten the resulting DataFrame from apply() to remove the nested columns
         agg_result.columns = ['threshold', f'{col}_mean', f'{col}_top_25_mean', f'{col}_bottom_25_mean']
 
         # Merge into the final DataFrame with appropriate suffixes to avoid conflicts
