@@ -589,18 +589,26 @@ def plot_mean_relative_abundances_with_std(df: pd.DataFrame, output_dir: str) ->
 
 @time_it("Generating line plot with mean for top 25% and bottom 25% relative abundances by Crassvirales thresholds")
 def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: str) -> None:
-    """Generate and save a line plot showing the mean relative abundances with top 25% and bottom 25%
+    """Generate and save a line plot showing the mean relative abundances with top 25%, bottom 25%, and all values
     for taxonomic groups by Crassvirales thresholds."""
+
+    # Function to calculate the top and bottom 25% means
+    def calculate_top_bottom_means(group):
+        return pd.Series({
+            'mean': group.mean(),
+            'top_25_mean': group[group >= group.quantile(0.75)].mean(),
+            'bottom_25_mean': group[group <= group.quantile(0.25)].mean()
+        })
 
     # Aggregate the data by threshold to compute the mean, top 25%, and bottom 25% of relative abundances
     aggregated_df = df.groupby('threshold').agg({
-        'ratio_Bacteroidetes_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'ratio_Actinobacteria_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'ratio_Bacillota_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'ratio_Proteobacteria_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'ratio_Other_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'ratio_viral_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
-        'crassvirales_ratio': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)]
+        'ratio_Bacteroidetes_to_total': calculate_top_bottom_means,
+        'ratio_Actinobacteria_to_total': calculate_top_bottom_means,
+        'ratio_Bacillota_to_total': calculate_top_bottom_means,
+        'ratio_Proteobacteria_to_total': calculate_top_bottom_means,
+        'ratio_Other_to_total': calculate_top_bottom_means,
+        'ratio_viral_to_total': calculate_top_bottom_means,
+        'crassvirales_ratio': calculate_top_bottom_means
     }).reset_index()
 
     # Flatten the multi-index columns
@@ -613,24 +621,23 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         plt.plot(x, y_mean, label=label, color=color, marker='o')
         plt.fill_between(x, y_lower, y_upper, color=color, alpha=0.3)
 
-    # Plot each taxonomic group with its respective top and bottom 25% band
+    # Plot each taxonomic group with its respective top and bottom 25% mean
     for category, color in zip([
         'Bacteroidetes', 'Actinobacteria', 'Bacillota', 'Proteobacteria', 'Other', 'viral'],
             ['Bacteroidetes', 'Actinobacteria', 'Bacillota', 'Proteobacteria', 'Other', 'Viruses']):
         plot_top_bottom_25(
             aggregated_df['threshold'],
             aggregated_df[f'ratio_{category}_to_total_mean'],
-            aggregated_df[f'ratio_{category}_to_total_<lambda_0>'],
-            aggregated_df[f'ratio_{category}_to_total_<lambda_1>'],
+            aggregated_df[f'ratio_{category}_to_total_bottom_25_mean'],
+            aggregated_df[f'ratio_{category}_to_total_top_25_mean'],
             category, phylum_colors[color] if category != 'viral' else superkingdom_colors['Viruses'])
 
-    plt.title('Mean Relative Abundances by Crassvirales Threshold with meand for top and bottom 25%')
+    plt.title('Mean Relative Abundances by Crassvirales Threshold with mean for top and bottom 25%')
     plt.xlabel('Crassvirales Threshold (%)')
     plt.ylabel('Mean Relative Abundance')
     plt.legend(title='Taxonomic Groups')
 
     save_plot('mean_relative_abundances_top_bottom_25_lineplot.png', output_dir)
-
 
 @time_it("Comparing clusters")
 def compare_clusters(cluster_names: List[str], base_output_dir: str, tree_types: List[str]) -> None:
