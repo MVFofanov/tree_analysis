@@ -8,8 +8,8 @@ input:
   config_dir: "/home/zo49sog/crassvirales/phylomes/tree_analysis/config"
 #  clusters_file: "{config_dir}/clusters.txt"
 #  clusters_file: "{config_dir}/clusters_test.txt"
-#  clusters_file: "{config_dir}/clusters_test_small.txt"
-  clusters_file: "{config_dir}/clusters_test_smallest.txt"
+  clusters_file: "{config_dir}/clusters_test_small.txt"
+#  clusters_file: "{config_dir}/clusters_test_smallest.txt"
 
 output:
   base_output_dir: "/home/zo49sog/crassvirales/phylomes/tree_analysis/results"

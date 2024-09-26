@@ -232,37 +232,45 @@ def concatenate_clades_tables(output_dir: str, output_file: str) -> None:
     """Concatenate biggest_non_intersecting_clades tables for all thresholds and save to a new output table."""
     all_data = []
 
-    # Loop through each threshold from 10% to 100%
+    # Loop through each threshold from 0% to 100%
     for i in range(0, 11):
         threshold = i * 10
         file_path = os.path.join(output_dir, f"biggest_non_intersecting_clades_{threshold}_percent.tsv")
 
         if os.path.exists(file_path):
-            logging.debug(f"{file_path=}")
-            # print(f'{file_path=}')
-            with open(file_path) as f:
-                non_empty_lines = [line for line in f if line.strip()]
+            logging.debug(f"Processing file: {file_path}")
 
-            if len(non_empty_lines) == 0:
-                logging.warning(f"{file_path} exists but contains no non-empty lines.")
-                # print(f"Warning: {file_path} exists but contains no non-empty lines.")
-            else:
+            try:
+                # Check if the file is empty or has no valid content
+                if os.path.getsize(file_path) == 0:
+                    logging.warning(f"{file_path} is empty and will be skipped.")
+                    continue
+
+                # Read the file and check for valid columns
                 df = pd.read_csv(file_path, sep='\t')
-                df.insert(0, 'threshold', threshold)  # Insert threshold column at the beginning
+
+                if df.empty or df.shape[1] == 0:
+                    logging.warning(f"{file_path} has no valid columns and will be skipped.")
+                    continue
+
+                # Insert threshold column and append to the list of dataframes
+                df.insert(0, 'threshold', threshold)
                 all_data.append(df)
+            
+            except pd.errors.EmptyDataError:
+                logging.warning(f"{file_path} could not be read (EmptyDataError) and will be skipped.")
+                continue
+
         else:
             logging.warning(f"{file_path} does not exist.")
-            # print(f"Warning: {file_path} does not exist.")
-
+    
     if all_data:
-        # Concatenate all dataframes
+        # Concatenate all dataframes and save the result
         concatenated_df = pd.concat(all_data, ignore_index=True)
         concatenated_df.to_csv(output_file, sep='\t', index=False)
         logging.info(f"Concatenated clades table saved to {output_file}")
-        # print(f"Concatenated clades table saved to {output_file}")
     else:
-        logging.warning(f"No data found to concatenate in {output_dir}")
-        # print(f"No data found to concatenate in {output_dir}")
+        logging.warning(f"No valid data found to concatenate in {output_dir}")
 
 
 # @time_it("Assign clade features")
