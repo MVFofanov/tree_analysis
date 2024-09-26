@@ -609,6 +609,8 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
 
         # Flatten the resulting DataFrame from apply() to remove the nested columns
+        # agg_result.columns will be ['threshold', 'mean', 'top_25_mean', 'bottom_25_mean']
+        # We only have 3 columns from the `calculate_top_bottom_means` function
         agg_result.columns = ['threshold', f'{col}_mean', f'{col}_top_25_mean', f'{col}_bottom_25_mean']
 
         # Merge into the final DataFrame with appropriate suffixes to avoid conflicts
