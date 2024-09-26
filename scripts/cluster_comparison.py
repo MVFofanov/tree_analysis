@@ -612,11 +612,11 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
         # Flatten the resulting DataFrame
         agg_result = pd.concat([agg_result['threshold'], agg_result[col].apply(pd.Series)], axis=1)
-        # Merge into the final DataFrame
+        # Merge into the final DataFrame with appropriate suffixes to avoid conflicts
         if aggregated_df.empty:
             aggregated_df = agg_result
         else:
-            aggregated_df = pd.merge(aggregated_df, agg_result, on='threshold')
+            aggregated_df = pd.merge(aggregated_df, agg_result, on='threshold', suffixes=('', f'_{col}'))
 
     # Plotting
     plt.figure(figsize=(14, 8))
@@ -642,6 +642,7 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
     plt.legend(title='Taxonomic Groups')
 
     save_plot('mean_relative_abundances_top_bottom_25_lineplot.png', output_dir)
+
 
 @time_it("Comparing clusters")
 def compare_clusters(cluster_names: List[str], base_output_dir: str, tree_types: List[str]) -> None:
