@@ -401,6 +401,82 @@ def plot_mean_relative_abundances_with_error_bands(df: pd.DataFrame, output_dir:
     plt.close()
 
 
+def plot_mean_relative_abundances_with_error_bands_without_crassvirales(df: pd.DataFrame, output_dir: str) -> None:
+    """Generate and save a line plot showing the mean relative abundances with 25th and 75th percentiles
+    for taxonomic groups by Crassvirales thresholds."""
+
+    # Aggregate the data by threshold to compute the mean and percentiles of relative abundances
+    aggregated_df = df.groupby('threshold').agg({
+        'ratio_Bacteroidetes_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
+        'ratio_Actinobacteria_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
+        'ratio_Bacillota_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
+        'ratio_Proteobacteria_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
+        'ratio_Other_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)],
+        'ratio_viral_to_total': ['mean', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)]
+    }).reset_index()
+
+    # Flatten the multi-index columns
+    aggregated_df.columns = ['_'.join(col).strip() if col[1] else col[0] for col in aggregated_df.columns.values]
+
+    plt.figure(figsize=(14, 8))
+
+    # Function to plot the mean and error band for each taxonomic group
+    def plot_with_error_bands(x, y_mean, y_lower, y_upper, label, color):
+        plt.plot(x, y_mean, label=label, color=color, marker='o')
+        plt.fill_between(x, y_lower, y_upper, color=color, alpha=0.3)  # Shaded area between 25th and 75th percentile
+
+    # Plot each taxonomic group with its respective error band
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_Bacteroidetes_to_total_mean'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_0>'],
+        aggregated_df['ratio_Bacteroidetes_to_total_<lambda_1>'],
+        'Bacteroidetes', phylum_colors['Bacteroidetes']
+    )
+
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_Actinobacteria_to_total_mean'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Actinobacteria_to_total_<lambda_1>'],
+        'Actinobacteria', phylum_colors['Actinobacteria']
+    )
+
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_Bacillota_to_total_mean'],
+        aggregated_df['ratio_Bacillota_to_total_<lambda_0>'], aggregated_df['ratio_Bacillota_to_total_<lambda_1>'],
+        'Bacillota', phylum_colors['Bacillota']
+    )
+
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_Proteobacteria_to_total_mean'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_0>'],
+        aggregated_df['ratio_Proteobacteria_to_total_<lambda_1>'],
+        'Proteobacteria', phylum_colors['Proteobacteria']
+    )
+
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_Other_to_total_mean'],
+        aggregated_df['ratio_Other_to_total_<lambda_0>'], aggregated_df['ratio_Other_to_total_<lambda_1>'],
+        'Other Bacteria', phylum_colors['Other']
+    )
+
+    plot_with_error_bands(
+        aggregated_df['threshold'], aggregated_df['ratio_viral_to_total_mean'],
+        aggregated_df['ratio_viral_to_total_<lambda_0>'], aggregated_df['ratio_viral_to_total_<lambda_1>'],
+        'Viral', superkingdom_colors['Viruses']
+    )
+
+    plt.title('Mean Relative Abundances by Crassvirales Threshold (With Percentiles)')
+    plt.xlabel('Crassvirales Threshold (%)')
+    plt.ylabel('Mean Relative Abundance (with 25th and 75th Percentiles)')
+    plt.legend(title='Taxonomic Groups')
+
+    figures_dir = os.path.join(output_dir, 'figures')
+    os.makedirs(figures_dir, exist_ok=True)
+    output_file = os.path.join(figures_dir, 'mean_relative_abundances_with_percentiles_lineplot_without_crassvirales.png')
+    plt.savefig(output_file, dpi=900)
+    plt.close()
+
+
 def plot_mean_relative_abundances_with_log10_error_bands(df: pd.DataFrame, output_dir: str) -> None:
     """Generate and save a line plot showing the log10-transformed mean relative abundances
     with 25th and 75th percentiles
@@ -609,8 +685,7 @@ def plot_mean_relative_abundances_top_bottom_25(df: pd.DataFrame, output_dir: st
         agg_result = df.groupby('threshold')[col].apply(calculate_top_bottom_means).reset_index()
 
         # Flatten the resulting DataFrame from apply() to remove the nested columns
-        # agg_result.columns will be ['threshold', 'mean', 'top_25_mean', 'bottom_25_mean']
-        # We only have 3 columns from the `calculate_top_bottom_means` function
+        # agg_result will already have the 'threshold' column
         agg_result.columns = ['threshold', f'{col}_mean', f'{col}_top_25_mean', f'{col}_bottom_25_mean']
 
         # Merge into the final DataFrame with appropriate suffixes to avoid conflicts
@@ -661,6 +736,8 @@ def compare_clusters(cluster_names: List[str], base_output_dir: str, tree_types:
             plot_mean_relative_abundances_lineplot(concatenated_df,
                                                    os.path.join(base_output_dir, 'cluster_analysis', tree_type))
             plot_mean_relative_abundances_with_error_bands(concatenated_df,
+                                                           os.path.join(base_output_dir, 'cluster_analysis', tree_type))
+            plot_mean_relative_abundances_with_error_bands_without_crassvirales(concatenated_df,
                                                            os.path.join(base_output_dir, 'cluster_analysis', tree_type))
             plot_mean_relative_abundances_with_log10_error_bands(concatenated_df,
                                                                  os.path.join(base_output_dir, 'cluster_analysis',
