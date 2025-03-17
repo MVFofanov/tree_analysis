@@ -28,7 +28,8 @@ with open(clusters_file) as f:
     cluster_names = [line.strip() for line in f.readlines() if line.strip()]
 
 # Define tree types
-tree_types = ["rooted", "unrooted", "midpoint"]
+# tree_types = ["rooted", "unrooted", "midpoint"]
+tree_types = ["unrooted"]
 
 # Main rule to request all outputs for both rooted and unrooted trees
 rule all:
@@ -52,7 +53,7 @@ rule process_cluster:
     shell:
         """
         mkdir -p {output_dir}/{wildcards.cluster}/{wildcards.tree_type}
-        source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
+        source ~/miniconda3/etc/profile.d/conda.sh && conda activate tree_analysis
         python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/main.py --cluster {wildcards.cluster} --config {input.config}
         """
 
@@ -71,6 +72,6 @@ rule compare_clusters:
         tree_type=lambda wildcards: wildcards.tree_type
     shell:
         """
-        source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
+        source ~/miniconda3/etc/profile.d/conda.sh && conda activate tree_analysis
         python3 /home/zo49sog/crassvirales/phylomes/tree_analysis/scripts/cluster_comparison.py --config {input.config} --clusters_file "{input.clusters_file}" > {output.final_log}
         """

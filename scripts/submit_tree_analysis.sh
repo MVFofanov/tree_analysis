@@ -12,7 +12,7 @@
 date; hostname; pwd
 
 # Load Snakemake environment or module
-source /home/zo49sog/mambaforge/etc/profile.d/conda.sh && conda activate tree_analysis
+source ~/miniconda3/etc/profile.d/conda.sh && conda activate tree_analysis
 
 working_dir="/home/zo49sog/crassvirales/phylomes/tree_analysis"
 

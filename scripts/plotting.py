@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Dict
 
@@ -6,50 +7,77 @@ import pandas as pd
 import seaborn as sns
 
 from colours import superkingdom_colors, phylum_colors, crassvirales_color
+from logging_utils import setup_logging
 from utils import time_it
+
+logger = logging.getLogger()  # Get the configured logger
 
 
 def plot_bacterial_ratios_vs_threshold(concatenated_table: str, output_dir: str, tree_type: str) -> None:
     """Plot bacterial ratios vs thresholds and save the figure."""
-    # Create the figures directory if it doesn't exist
+    
     figures_dir = os.path.join(output_dir, 'figures')
     os.makedirs(figures_dir, exist_ok=True)
 
-    # Load the concatenated table
-    df = pd.read_csv(concatenated_table, sep='\t')
-
-    # Define the dictionary of colors for the lines
-    colors: Dict[str, str] = {
-        'ratio_Bacteroidetes_to_total': phylum_colors['Bacteroidetes'],  # Blue
-        'ratio_Actinobacteria_to_total': phylum_colors['Actinobacteria'],  # Orange
-        'ratio_Bacillota_to_total': phylum_colors['Bacillota'],  # Green
-        'ratio_Proteobacteria_to_total': phylum_colors['Proteobacteria'],  # Red
-        'ratio_Other_to_total': 'gray',  # Purple
-        'ratio_bacterial_to_total': superkingdom_colors['Bacteria'],  # Brown
-        'crassvirales_ratio': crassvirales_color,  # Cyan for Crassvirales ratio
-        'ratio_viral_to_total': superkingdom_colors['Viruses']  # Magenta for Viral ratio
+    logger.info("Loading concatenated table from %s", concatenated_table)
+    
+    try:
+        df = pd.read_csv(concatenated_table, sep='\t', index_col=False)
+        logger.info(f"First rows of df:\n{df.head()}\n")
+    except Exception as e:
+        logger.error("Error loading concatenated table: %s", str(e), exc_info=True)
+        return
+    
+    colors = {
+        'ratio_Bacteroidetes_to_total': phylum_colors['Bacteroidetes'],  
+        'ratio_Actinobacteria_to_total': phylum_colors['Actinobacteria'],  
+        'ratio_Bacillota_to_total': phylum_colors['Bacillota'],  
+        'ratio_Proteobacteria_to_total': phylum_colors['Proteobacteria'],  
+        'ratio_Other_to_total': 'gray',  
+        'ratio_bacterial_to_total': superkingdom_colors['Bacteria'],  
+        'crassvirales_ratio': crassvirales_color,  
+        'ratio_viral_to_total': superkingdom_colors['Viruses']  
     }
 
-    # Prepare the DataFrame in long format for seaborn plotting
     df_long = pd.melt(df, id_vars=['threshold'], value_vars=list(colors.keys()),
                       var_name='Type', value_name='Ratio (%)')
+    
+    logger.info("First rows of df_long before resetting index:\n%s", df_long.head())
+    logger.info("Data types:\n%s", df_long.dtypes)
+    
+    df_long = df_long.reset_index(drop=True)
+    
+    
+    # logger.info("First rows of df_long:\n%s", df_long.head().to_string())
+    logger.info("First rows of df_long after resetting index:\n%s", df_long.head())
+    logger.info("Data types:\n%s", df_long.dtypes)
 
-    # Plot using seaborn
     plt.figure(figsize=(12, 8))
-    sns.lineplot(x='threshold', y='Ratio (%)', hue='Type', data=df_long, palette=colors)
+    
+    try:
+        logger.info(f"df_long['threshold'] shape: {df_long['threshold'].shape}, ndim: {df_long['threshold'].ndim}")
+        logger.info(f"df_long['Ratio (%)'] shape: {df_long['Ratio (%)'].shape}, ndim: {df_long['Ratio (%)'].ndim}")
 
-    # Customize the plot
+        # sns.lineplot(x=df_long["threshold"].values.flatten(), y=df_long["Ratio (%)"].values.flatten(), hue='Type', data=df_long, palette=colors)
+        sns.lineplot(x=df_long["threshold"].to_numpy(), y=df_long["Ratio (%)"].to_numpy(), hue='Type', data=df_long, palette=colors)
+
+    except Exception as e:
+        logger.error("Error while generating plot: %s", str(e), exc_info=True)
+        return
+
     plt.title(f'Bacterial, Viral, and Crassvirales Ratios vs Thresholds ({tree_type.capitalize()} Tree)')
     plt.xlabel('Threshold of Crassvirales proteins in the clade (%)')
     plt.ylabel('Ratio to Total Members (%)')
     plt.legend(title='Type', loc='best')
 
-    # Save the figure
     output_file = os.path.join(figures_dir, f'bacterial_viral_crassvirales_ratios_vs_threshold_{tree_type}.png')
-    plt.savefig(output_file, dpi=300)
-    plt.close()
-
-    # print(f"Plot saved to {output_file}")
+    
+    try:
+        plt.savefig(output_file, dpi=300)
+        plt.close()
+        logger.info("Plot saved to %s", output_file)
+    except Exception as e:
+        logger.error("Error saving plot: %s", str(e), exc_info=True)
 
 
 def plot_crassvirales_bacterial_viral_ratios_vs_threshold(concatenated_table: str, output_dir: str,
