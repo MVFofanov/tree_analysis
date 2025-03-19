@@ -42,24 +42,24 @@ def plot_bacterial_ratios_vs_threshold(concatenated_table: str, output_dir: str,
     df_long = pd.melt(df, id_vars=['threshold'], value_vars=list(colors.keys()),
                       var_name='Type', value_name='Ratio (%)')
     
-    logger.info("First rows of df_long before resetting index:\n%s", df_long.head())
-    logger.info("Data types:\n%s", df_long.dtypes)
+    logger.debug("First rows of df_long before resetting index:\n%s", df_long.head())
+    logger.debug("Data types:\n%s", df_long.dtypes)
     
     df_long = df_long.reset_index(drop=True)
     
     
     # logger.info("First rows of df_long:\n%s", df_long.head().to_string())
-    logger.info("First rows of df_long after resetting index:\n%s", df_long.head())
-    logger.info("Data types:\n%s", df_long.dtypes)
+    logger.debug("First rows of df_long after resetting index:\n%s", df_long.head())
+    logger.debug("Data types:\n%s", df_long.dtypes)
 
     plt.figure(figsize=(12, 8))
     
     try:
-        logger.info(f"df_long['threshold'] shape: {df_long['threshold'].shape}, ndim: {df_long['threshold'].ndim}")
-        logger.info(f"df_long['Ratio (%)'] shape: {df_long['Ratio (%)'].shape}, ndim: {df_long['Ratio (%)'].ndim}")
+        logger.debug(f"df_long['threshold'] shape: {df_long['threshold'].shape}, ndim: {df_long['threshold'].ndim}")
+        logger.debug(f"df_long['Ratio (%)'] shape: {df_long['Ratio (%)'].shape}, ndim: {df_long['Ratio (%)'].ndim}")
 
         # sns.lineplot(x=df_long["threshold"].values.flatten(), y=df_long["Ratio (%)"].values.flatten(), hue='Type', data=df_long, palette=colors)
-        sns.lineplot(x=df_long["threshold"].to_numpy(), y=df_long["Ratio (%)"].to_numpy(), hue='Type', data=df_long, palette=colors)
+        sns.lineplot(x=df_long["threshold"], y=df_long["Ratio (%)"], hue='Type', data=df_long, palette=colors)
 
     except Exception as e:
         logger.error("Error while generating plot: %s", str(e), exc_info=True)
